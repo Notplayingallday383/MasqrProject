@@ -19,16 +19,18 @@ import cookieParser from "cookie-parser";
 const LICENSE_SERVER_URL = "https://license.mercurywork.shop/validate?license=";
 const whiteListedDomains = ["anura.pro", "anura.mercurywork.shop", "anura.christmas"]; // Add any public domains you have here
 const failureFile = fs.readFileSync("Checkfailed.html", "utf8");
-const idFile = "ids.txt"
+const idFile = "ids.json"
 const placeholder = fs.readFileSync("placeholder.svg", "utf8"); // For v0.dev websites
 
 let storedIDs = [];
 if (fs.existsSync(idFile)) {
-    storedIDs = fs.readFileSync(idFile, "utf8").split("\n").filter(Boolean);
+    const data = fs.readFileSync(idFile, "utf8");
+    storedIDs = JSON.parse(data);
 }
 // Save the storedIDs incase your server shits itself or something
 setTimeout(() => {
-    fs.writeFile(idFile, storedIDs.join("\n"));
+    const IDS = JSON.stringify(storedIDs, null, 2);
+    fs.writeFile(idFile, IDS);
 }, 5000);
 
 const app = express();
