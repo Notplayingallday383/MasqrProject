@@ -16,7 +16,7 @@ If your trying to setup a way to generate keys in a bot or a command or somethin
 
 ```js
 async function getKey() {
-    const response = await fetch('http://localhost:8004/newlicense', {
+    const response = await fetch('http://localhost:8004/newLicense?host=yoursitehere', {
         headers: {
             "PSK": "your-psk-from-earlier-here"
         }

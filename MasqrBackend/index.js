@@ -28,9 +28,9 @@ if (fs.existsSync(idFile)) {
     storedIDs = JSON.parse(data);
 }
 // Save the storedIDs incase your server shits itself or something
-setTimeout(() => {
+setInterval(() => {
     const IDS = JSON.stringify(storedIDs, null, 2);
-    fs.writeFile(idFile, IDS);
+    fs.writeFile(idFile, IDS, (res) => {});
 }, 5000);
 
 const app = express();
