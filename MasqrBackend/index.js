@@ -19,7 +19,17 @@ import cookieParser from "cookie-parser";
 const LICENSE_SERVER_URL = "https://license.mercurywork.shop/validate?license=";
 const whiteListedDomains = ["anura.pro", "anura.mercurywork.shop", "anura.christmas"]; // Add any public domains you have here
 const failureFile = fs.readFileSync("Checkfailed.html", "utf8");
+const idFile = "ids.txt"
 const placeholder = fs.readFileSync("placeholder.svg", "utf8"); // For v0.dev websites
+
+let storedIDs = [];
+if (fs.existsSync(idFile)) {
+    storedIDs = fs.readFileSync(idFile, "utf8").split("\n").filter(Boolean);
+}
+// Save the storedIDs incase your server shits itself or something
+setTimeout(() => {
+    fs.writeFile(idFile, storedIDs.join("\n"));
+}, 5000);
 
 const app = express();
 
@@ -67,8 +77,14 @@ app.use(async (req, res, next) => {
     const authheader = req.headers.authorization;
     
     if (req.cookies["authcheck"]) {
-        next();
-        return;
+        const isVerified = storedIDs.includes(req.cookies["authcheck"]);
+        if (isVerified) {
+            next();
+            return;
+        } else {
+            res.setHeader("Content-Type", "text/html"); 
+            return res.status(401).send(failureFile);
+        }
     }
 
 
@@ -79,7 +95,6 @@ app.use(async (req, res, next) => {
     }
     
     if (!authheader) {
-        
         res.setHeader('WWW-Authenticate', 'Basic'); // Yeah so we need to do this to get the auth params, kinda annoying and just showing a login prompt gives it away so its behind a 10s refresh check
         res.status(401);
         MasqFail(req, res) 
@@ -94,7 +109,14 @@ app.use(async (req, res, next) => {
     const licenseCheck = ((await (await fetch(LICENSE_SERVER_URL + pass + "&host=" + req.headers.host)).json()))["status"]
     console.log(LICENSE_SERVER_URL + pass + "&host=" + req.headers.host +" returned " +licenseCheck)
     if (licenseCheck == "License valid") {
-        res.cookie("authcheck", "true", {expires: new Date((Date.now()) + (365*24*60*60 * 1000))}) // authorize session, for like a year, by then the link will be expired lol
+        storedIDs.push();
+        const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let code = '';
+        for (let i = 0; i < 5; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            code += characters[randomIndex];
+        }
+        res.cookie("authcheck", code, {expires: new Date((Date.now()) + (365*24*60*60 * 1000))}) // authorize session, for like a year, by then the link will be expired lol
         res.send(`<script> window.location.href = window.location.href </script>`) // fun hack to make the browser refresh and remove the auth params from the URL
         return;
     }
