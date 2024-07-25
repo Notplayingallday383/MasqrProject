@@ -111,13 +111,13 @@ app.use(async (req, res, next) => {
     const licenseCheck = ((await (await fetch(LICENSE_SERVER_URL + pass + "&host=" + req.headers.host)).json()))["status"]
     console.log(LICENSE_SERVER_URL + pass + "&host=" + req.headers.host +" returned " +licenseCheck)
     if (licenseCheck == "License valid") {
-        storedIDs.push();
         const characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         let code = '';
         for (let i = 0; i < 5; i++) {
             const randomIndex = Math.floor(Math.random() * characters.length);
             code += characters[randomIndex];
         }
+        storedIDs.push(code);
         res.cookie("authcheck", code, {expires: new Date((Date.now()) + (365*24*60*60 * 1000))}) // authorize session, for like a year, by then the link will be expired lol
         res.send(`<script> window.location.href = window.location.href </script>`) // fun hack to make the browser refresh and remove the auth params from the URL
         return;
