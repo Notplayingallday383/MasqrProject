@@ -10,6 +10,8 @@ Think of Masqr as a "anti link leaking" authentication system that allows you to
 
 This is fairly easy to deploy to your backend using `express` as seen in the `MasqrBackend` example, and you can implement this into different backends fairly similarly.
 
+If your trying to setup the licensing server, you can find documentation for that [here](/LicensingServer/README.md)
+
 ## How it works
 
 How masqr works is really simple. When you get a link from a proxy bot of some sorts (for demonstration purposes I will be referencing Titanium Networks Proxy Bot) and you will be told to click on a link with some strange characters that will create a cookie which is "your license" then when you visit the site afterwards It will check the cookie with the one in the licensing server's database to make sure it wasn't tampered with then your in!

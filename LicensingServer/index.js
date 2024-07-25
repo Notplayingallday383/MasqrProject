@@ -88,7 +88,7 @@ function throwError(res, error) {
 /**
  * @description Entrypoint and URL router
  */
-http.createServer(function (req, res) {
+const server = http.createServer(function (req, res) {
     
     if (req.url?.startsWith("/newLicense"))
         return genID(req, res).catch();
@@ -98,7 +98,11 @@ http.createServer(function (req, res) {
     res.statusCode = 404
     res.end(JSON.stringify({error: "Invalid route"}))
 
-}).listen(8004);
+});
+
+server.listen(8004, () => {
+    console.log('Licensing Server is running on Port: 8004');
+});
 
 // Run cleanupLicenses once per day to prevent a memory leak
 setInterval(cleanupLicenses, 24 * 60 * 60 * 1000);
